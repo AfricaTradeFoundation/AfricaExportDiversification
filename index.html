@@ -686,20 +686,8 @@
                 renderer.setSize(w, h);
             });
 
-            // === Add reset button ===
-            var resetButton = document.createElement('button');
-            resetButton.textContent = 'Reset View';
-            resetButton.style.position = 'absolute';
-            resetButton.style.bottom = '10px';
-            resetButton.style.right = '10px';
-            resetButton.style.zIndex = '1000';
-            resetButton.style.padding = '5px 10px';
-            resetButton.style.backgroundColor = '#2196F3';
-            resetButton.style.color = 'white';
-            resetButton.style.border = 'none';
-            resetButton.style.borderRadius = '4px';
-            resetButton.style.cursor = 'pointer';
-            resetButton.addEventListener('click', () => {
+            // Reset function (no visible button)
+            function resetView() {
                 // Reset camera to original position
                 camera.position.set(640.6687, 124.8113, 1300);
                 camera.rotation.set(-0.1094, 0.4680, 0.0495);
@@ -713,8 +701,10 @@
                 axisTitles.forEach(title => {
                     title.element.style.opacity = '1';
                 });
-            });
-            container.appendChild(resetButton);
+            }
+            
+            // Add double-click handler to reset view
+            container.addEventListener('dblclick', resetView);
 
             // === Show titles at the beginning ===
             axisTitles.forEach(title => {
