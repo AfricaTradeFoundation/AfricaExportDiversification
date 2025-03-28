@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html>
 <head>
     <title>3D Bubble Chart (Fixed Y-Axis)</title>
@@ -114,6 +113,7 @@
             pointer-events: none;
             border: none;
             line-height: 1.4;
+            transition: opacity 0.5s ease;
         }
     </style>
 </head>
@@ -168,7 +168,7 @@
             // Define specific axis values
             // New z-axis range: 1.5, 1.4, 1.3, 0, -1.3, -1.4, -1.5, -1.6, -1.7, -1.8, -1.9, -2.0, -2.1, -2.2
             var yearValues = [2008, 2011, 2014, 2017, 2020, 2023];
-            var yValues = [950, 960, 970, 980, 990, 1000, 1010];
+            var yValues = [1030, 1040, 1050, 1060, 1070,1080,1090,1100,1110];
             var zGridValues = [1.5, 1.4, 1.3, 0, -1.3, -1.4, -1.5, -1.6, -1.7, -1.8, -1.9, -2.0, -2.1, -2.2];
             
             // === Simple Grid Planes ===
@@ -261,7 +261,7 @@
             
             var yzGrid = new THREE.Group();
             for (let i = 0; i < yValues.length; i++) {
-                let normalized = (yValues[i] - 950) / (1010 - 950);
+                let normalized = (yValues[i] - 1030) / (1110 - 1030);
                 let yPos = (normalized * size) - size/2;
                 let lineGeometry = new THREE.BufferGeometry();
                 let vertices = new Float32Array([
@@ -285,7 +285,7 @@
                 yzGrid.add(line);
             }
             for (let i = 0; i < yValues.length; i++) {
-                let normalized = (yValues[i] - 950) / (1010 - 950);
+                let normalized = (yValues[i] - 1030) / (1110 - 1030);
                 let yPos = (normalized * size) - size/2;
                 let lineGeometry = new THREE.BufferGeometry();
                 let vertices = new Float32Array([
@@ -312,7 +312,7 @@
                 xyGrid.add(line);
             }
             for (let i = 0; i < yValues.length; i++) {
-                let normalized = (yValues[i] - 950) / (1010 - 950);
+                let normalized = (yValues[i] - 1030) / (1110 - 1030);
                 let yPos = (normalized * size) - size/2;
                 let lineGeometry = new THREE.BufferGeometry();
                 let vertices = new Float32Array([
@@ -337,6 +337,7 @@
             container.appendChild(htmlLabelsContainer);
             
             var htmlLabels = [];
+            var axisTitles = []; // Array to specifically track axis titles
             
             function createAxisLabel(text, position3D, isZero = false) {
                 var id = 'label-' + htmlLabels.length;
@@ -368,10 +369,15 @@
                 });
                 title.innerHTML = html;
                 htmlLabelsContainer.appendChild(title);
-                htmlLabels.push({
+                
+                // Store in both arrays
+                var titleObj = {
                     element: title,
                     position3D: position3D
-                });
+                };
+                htmlLabels.push(titleObj);
+                axisTitles.push(titleObj);
+                
                 return title;
             }
             
@@ -381,6 +387,10 @@
                     position.project(camera);
                     var x = (position.x * 0.5 + 0.5) * container.clientWidth;
                     var y = (-position.y * 0.5 + 0.5) * container.clientHeight;
+                    
+                    // Check if this label is an axis title
+                    var isAxisTitle = axisTitles.some(title => title.element === label.element);
+                    
                     if (position.z < 1) {
                         label.element.style.display = 'block';
                         label.element.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`;
@@ -388,11 +398,26 @@
                             label.element.style.color = '#FF5722';
                             label.element.style.fontWeight = 'bold';
                         }
-                        label.element.style.opacity = 1;
+                        
+                        // Only set opacity for non-axis titles
+                        if (!isAxisTitle) {
+                            label.element.style.opacity = 1;
+                        }
                     } else {
                         label.element.style.display = 'none';
                     }
                 });
+                
+                // Handle axis titles visibility based on user interaction and camera position
+                if (userHasMoved && !isAtOriginalPosition) {
+                    axisTitles.forEach(title => {
+                        title.element.style.opacity = '0';
+                    });
+                } else {
+                    axisTitles.forEach(title => {
+                        title.element.style.opacity = '1';
+                    });
+                }
             }
 
             // X-axis labels
@@ -407,7 +432,7 @@
 
             // Y-axis labels
             for (let i = 0; i < yValues.length; i++) {
-                let normalized = (yValues[i] - 950) / (1010 - 950);
+                let normalized = (yValues[i] - 1030) / (1110 - 1030);
                 let yPos = (normalized * size) - size/2;
                 createAxisLabel(
                     yValues[i].toString(),
@@ -455,22 +480,22 @@
             
             // === Data ===
             var data = [
-                { Year: 2008, Number: 976, Complexity: -2.158483286, Exports: 522630721000 },
-                { Year: 2009, Number: 970, Complexity: -2.026001043, Exports: 359299548000 },
-                { Year: 2010, Number: 1004, Complexity: -1.924578486, Exports: 485614725000 },
-                { Year: 2011, Number: 1006, Complexity: -1.843448638, Exports: 586027217000 },
-                { Year: 2012, Number: 1002, Complexity: -1.805386413, Exports: 592375488000 },
-                { Year: 2013, Number: 1003, Complexity: -1.778028639, Exports: 555043361000 },
-                { Year: 2014, Number: 998, Complexity: -1.799859097, Exports: 532697314000 },
-                { Year: 2015, Number: 984, Complexity: -1.607519897, Exports: 414200271000 },
-                { Year: 2016, Number: 986, Complexity: -1.515806918, Exports: 361412344000 },
-                { Year: 2017, Number: 983, Complexity: -1.549698532, Exports: 426598710000 },
-                { Year: 2018, Number: 986, Complexity: -1.643178627, Exports: 503364320000 },
-                { Year: 2019, Number: 980, Complexity: -1.494101427, Exports: 472200546000 },
-                { Year: 2020, Number: 960, Complexity: -1.364126405, Exports: 379223856000 },
-                { Year: 2021, Number: 993, Complexity: -1.403223351, Exports: 554607897000 },
-                { Year: 2022, Number: 987, Complexity: -1.533794971, Exports: 677756664000 },
-                { Year: 2023, Number: 978, Complexity: -1.555192642, Exports: 636362686000 }
+                { Year: 2008, Number: 1073, Complexity: -2.158483286, Exports: 525067060000 },
+                { Year: 2009, Number: 1057, Complexity: -2.026001043, Exports: 361640359000 },
+                { Year: 2010, Number: 1099, Complexity: -1.924578486, Exports: 488072856000 },
+                { Year: 2011, Number: 1105, Complexity: -1.843448638, Exports: 589702062000 },
+                { Year: 2012, Number: 1099, Complexity: -1.805386413, Exports: 596014429000 },
+                { Year: 2013, Number: 1095, Complexity: -1.778028639, Exports: 557374069000 },
+                { Year: 2014, Number: 1091, Complexity: -1.799859097, Exports: 535216175000 },
+                { Year: 2015, Number: 1079, Complexity: -1.607519897, Exports: 416884919000 },
+                { Year: 2016, Number: 1075, Complexity: -1.515806918, Exports: 363973195000 },
+                { Year: 2017, Number: 1072, Complexity: -1.549698532, Exports: 429112107000 },
+                { Year: 2018, Number: 1075, Complexity: -1.643178627, Exports: 505675686000 },
+                { Year: 2019, Number: 1065, Complexity: -1.494101427, Exports: 474041749000 },
+                { Year: 2020, Number: 1038, Complexity: -1.364126405, Exports: 381305260000 },
+                { Year: 2021, Number: 1083, Complexity: -1.403223351, Exports: 557087760000 },
+                { Year: 2022, Number: 1087, Complexity: -1.533794971, Exports: 683033625000 },
+                { Year: 2023, Number: 1078, Complexity: -1.555192642, Exports: 640884099000 }
             ];
 
             var minExport = Math.min.apply(Math, data.map(d => d.Exports));
@@ -490,7 +515,7 @@
                 });
                 var sphere = new THREE.Mesh(geometry, material);
                 sphere.position.x = scaleValue(d.Year, 2008, 2023, -size/2, size/2);
-                sphere.position.y = scaleValue(d.Number, 950, 1010, -size/2, size/2);
+                sphere.position.y = scaleValue(d.Number, 1030, 1110, -size/2, size/2);
                 let zIndex = -1;
                 for (let i = 0; i < zGridValues.length - 1; i++) {
                     if (d.Complexity <= zGridValues[i] && d.Complexity > zGridValues[i+1]) {
@@ -522,7 +547,7 @@
             var linePoints = [];
             data.forEach(function(d) {
                 var x = scaleValue(d.Year, 2008, 2023, -size/2, size/2);
-                var y = scaleValue(d.Number, 950, 1010, -size/2, size/2);
+                var y = scaleValue(d.Number, 1030, 1110, -size/2, size/2);
                 let zIndex = -1;
                 for (let i = 0; i < zGridValues.length - 1; i++) {
                     if (d.Complexity <= zGridValues[i] && d.Complexity > zGridValues[i+1]) {
@@ -546,7 +571,8 @@
                 linePoints.push(new THREE.Vector3(x, y, z));
             });
             var lineGeometry = new THREE.BufferGeometry().setFromPoints(linePoints);
-            var lineMaterial = new THREE.LineBasicMaterial({ color: 0x2196F3 });
+            var lineMaterial = new THREE.LineBasicMaterial({ color: 0x2196F3,transparent: true,
+    opacity: 0.1  });
             var connectingLine = new THREE.Line(lineGeometry, lineMaterial);
             scene.add(connectingLine);
 
@@ -583,10 +609,35 @@
                 }
             }
 
-            // === Mouse drag rotation ===
+            // Store the original camera position and rotation for comparison
+            var originalCameraPosition = new THREE.Vector3(640.6687, 124.8113, 1300);
+            var originalCameraRotation = new THREE.Euler(-0.1094, 0.4680, 0.0495);
+            var userHasMoved = false; // Flag to track if user has moved the chart
+            var isAtOriginalPosition = true; // Flag to track if camera is at original position
+            
+            // Function to check if camera is close to original position
+            function isCameraAtOriginalPosition() {
+                // Check if camera position is close to original
+                var positionDistance = camera.position.distanceTo(originalCameraPosition);
+                
+                // Check if camera rotation is close to original
+                var rotationDistance = Math.abs(camera.rotation.x - originalCameraRotation.x) +
+                                       Math.abs(camera.rotation.y - originalCameraRotation.y) +
+                                       Math.abs(camera.rotation.z - originalCameraRotation.z);
+                
+                // Return true if both position and rotation are very close
+                return positionDistance < 10 && rotationDistance < 0.05;
+            }
+
+            // === HTML labels for axes ===
             var isDragging = false;
             var previousMousePosition = { x: 0, y: 0 };
-            window.addEventListener('mousedown', () => { isDragging = true; });
+            window.addEventListener('mousedown', () => { 
+                isDragging = true;
+                // Set flag when user starts dragging
+                userHasMoved = true;
+                isAtOriginalPosition = false;
+            });
             window.addEventListener('mouseup', () => { isDragging = false; });
             window.addEventListener('mousemove', e => {
                 if (isDragging) {
@@ -614,6 +665,9 @@
             // === Mouse wheel zoom ===
             window.addEventListener('wheel', event => {
                 event.preventDefault();
+                // Set flag when user zooms
+                userHasMoved = true;
+                isAtOriginalPosition = false;
                 var minZoom = 800, maxZoom = 2500, zoomSpeed = 0.1;
                 var distance = camera.position.length();
                 var zoomFactor = event.deltaY > 0 ? 1 + zoomSpeed : 1 - zoomSpeed;
@@ -621,8 +675,7 @@
                 newDistance = Math.min(Math.max(newDistance, minZoom), maxZoom);
                 var scale = newDistance / distance;
                 camera.position.multiplyScalar(scale);
-                camera.lookAt(0, 0, 0);
-            });
+                camera.lookAt(0, 0, 0);});
 
             // === Resize handling ===
             window.addEventListener('resize', () => {
@@ -633,9 +686,48 @@
                 renderer.setSize(w, h);
             });
 
+            // === Add reset button ===
+            var resetButton = document.createElement('button');
+            resetButton.textContent = 'Reset View';
+            resetButton.style.position = 'absolute';
+            resetButton.style.bottom = '10px';
+            resetButton.style.right = '10px';
+            resetButton.style.zIndex = '1000';
+            resetButton.style.padding = '5px 10px';
+            resetButton.style.backgroundColor = '#2196F3';
+            resetButton.style.color = 'white';
+            resetButton.style.border = 'none';
+            resetButton.style.borderRadius = '4px';
+            resetButton.style.cursor = 'pointer';
+            resetButton.addEventListener('click', () => {
+                // Reset camera to original position
+                camera.position.set(640.6687, 124.8113, 1300);
+                camera.rotation.set(-0.1094, 0.4680, 0.0495);
+                camera.lookAt(0, 0, 0);
+                
+                // Reset the movement flags
+                userHasMoved = false;
+                isAtOriginalPosition = true;
+                
+                // Show all axis titles again
+                axisTitles.forEach(title => {
+                    title.element.style.opacity = '1';
+                });
+            });
+            container.appendChild(resetButton);
+
+            // === Show titles at the beginning ===
+            axisTitles.forEach(title => {
+                title.element.style.opacity = '1';
+            });
+
             // === Render loop ===
             function animate() {
                 requestAnimationFrame(animate);
+                
+                // Check if camera is at or near original position
+                isAtOriginalPosition = isCameraAtOriginalPosition();
+                
                 renderer.render(scene, camera);
                 updateLabelPositions();
             }
@@ -643,4 +735,4 @@
         });
     </script>
 </body>
-</html>
+</html><!DOCTYPE html>
